@@ -5,6 +5,39 @@ const onlyUnique = (value, index, self) => self.indexOf(value) === index;
 
 const onlyFemale = (self) => self.gender === "female";
 
+const isAdult = (self) => self.age >= 18;
+
+const creditCardExpiringSoon = (self) => {
+	const today = new Date();
+	const creditCardExpiring = self.credit_card.expiration.split('/');
+	const monthExpiring = creditCardExpiring[0];
+	const yearExpiring = parseInt(`20${creditCardExpiring[1]}`);
+	const currentMonth = today.getMonth() + 1;
+	const currentYear = today.getFullYear();
+	console.log(monthExpiring, yearExpiring, currentMonth, currentYear);
+	if (currentYear === yearExpiring) {
+		if (currentMonth <= monthExpiring) {
+			console.log("expiring this year")
+			return true;
+		} else {
+			console.log("already expired!")
+			return false;
+		}
+	} else if (yearExpiring === currentYear + 1) {
+		if (currentMonth > monthExpiring) {
+			console.log("expiring in the coming year");
+			return true;
+		} else {
+			console.log("expiring next year but not in the coming year")
+			return false;
+		}
+
+	} else {
+		console.log("not expiring in the next year but in ", yearExpiring)
+		return false;
+	}
+}
+
 const onlyCapricorn = (self) => {
 	return self.zodiac === "Capricorn"
 }
@@ -50,6 +83,25 @@ const sortFirstNames = (a, b) => {
 	return 0;
 }
 
+const sortExpirationDates = (a, b) => {
+	const dateA = a.credit_card.expiration.split('/');
+	const monthA = dateA[0];
+	const yearA = dateA[1];
+	const realDateA = new Date(`20${yearA}`, monthA, 0);
+	const dateB = b.credit_card.expiration.split('/');
+	const monthB = dateB[0];
+	const yearB = dateB[1];
+	const realDateB = new Date(`20${yearB}`, monthB, 0);
+	if (realDateA < realDateB) {
+		return -1;
+	}
+	if (realDateA > realDateB) {
+		return 1;
+	}
+	return 0;
+}
+
+
 const getCountryList = () => {
 	const regionArray = randomPersonData.map(person => person.region).sort();
 	var uniqueRegions = regionArray.filter(onlyUnique);
@@ -75,9 +127,49 @@ const getCapricornWomen = () => {
 		li.appendChild(img)
 		ol.appendChild(li)
 	})
+}
 
-	console.log(capricornWomenOlderThan30)
+/* Maak een lijst van mensen:
+
+laat per persoon de volgende data zien
+voornaam, achternaam
+telefoonnummer
+creditcardnummer
+verloopdatum
+De lijst mag alleen volwassenen bevatten.
+
+De verloopdatum moet in de toekomst liggen (van dit jaar).
+
+De verloopdatum moet in het komende jaar liggen.
+
+Sorteer de lijst zodat de snelst verlopende creditcards bovenaan staan. */
+
+const getListOfOldCreditCards = () => {
+	const adults = randomPersonData.filter(isAdult);
+	const ol = createList();
+	const peopleWithExpiringCreditcards = adults.filter(creditCardExpiringSoon);
+	peopleWithExpiringCreditcards.sort(sortExpirationDates);
+	console.log(peopleWithExpiringCreditcards);
+	console.log(peopleWithExpiringCreditcards[0].credit_card.expiration.split('/'))
+	peopleWithExpiringCreditcards.forEach(item => {
+		const li = document.createElement('li');
+		li.innerHTML = `Name: ${item.name} ${item.surname}, Phone number: ${item.phone}, credit card number: ${item.credit_card.number}, expiring: ${item.credit_card.expiration}`;
+		ol.appendChild(li)
+	})
+}
+
+
+const getListOfMostPeople = () => {
+	const regionArray = randomPersonData.map(person => person.region).sort();
+	const ol = createList();
+	regionArray.forEach(item => {
+		const li = document.createElement('li');
+		li.innerHTML = item;
+		ol.appendChild(li)
+	})
 }
 
 getCountryList();
 getCapricornWomen();
+getListOfOldCreditCards();
+getListOfMostPeople();
