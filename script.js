@@ -1,47 +1,15 @@
-console.log(randomPersonData);
 const main = document.querySelector('main');
 
-
-const onlyUnique = (value, index, self) => self.indexOf(value) === index;
-
-const onlyFemale = (self) => self.gender === "female";
-
-const isAdult = (self) => self.age >= 18;
-
-const creditCardExpiringSoon = (self) => {
-	const today = new Date();
-	const creditCardExpiring = self.credit_card.expiration.split('/');
-	const monthExpiring = creditCardExpiring[0];
-	const yearExpiring = parseInt(`20${creditCardExpiring[1]}`);
-	const currentMonth = today.getMonth() + 1;
-	const currentYear = today.getFullYear();
-	console.log(monthExpiring, yearExpiring, currentMonth, currentYear);
-	if (currentYear === yearExpiring) {
-		if (currentMonth <= monthExpiring) {
-			console.log("expiring this year")
-			return true;
-		} else {
-			console.log("already expired!")
-			return false;
-		}
-	} else if (yearExpiring === currentYear + 1) {
-		if (currentMonth > monthExpiring) {
-			console.log("expiring in the coming year");
-			return true;
-		} else {
-			console.log("expiring next year but not in the coming year")
-			return false;
-		}
-
-	} else {
-		console.log("not expiring in the next year but in ", yearExpiring)
-		return false;
-	}
+// DOM functions
+const createList = () => {
+	main.innerHTML = "";
+	const ol = document.createElement('ol');
+	main.appendChild(ol);
+	return ol;
 }
 
-const onlyCapricorn = (self) => {
-	return self.zodiac === "Capricorn"
-}
+
+// Assigning Zodiac signs
 
 function zodiac(day, month) {
 	var zodiac = ['', 'Capricorn', 'Aquarius', 'Pisces', 'Aries', 'Taurus', 'Gemini', 'Cancer', 'Leo', 'Virgo', 'Libra', 'Scorpio', 'Sagittarius', 'Capricorn'];
@@ -62,17 +30,42 @@ const assignZodiacSigns = () => {
 }
 assignZodiacSigns();
 
-const olderThan30 = (self) => {
-	return self.age > 30;
+
+// Filtering functions
+
+const onlyUnique = (value, index, self) => self.indexOf(value) === index;
+const onlyFemale = (self) => self.gender === "female";
+const isAdult = (self) => self.age >= 18;
+const onlyCapricorn = (self) => self.zodiac === "Capricorn";
+const olderThan30 = (self) => self.age > 30;
+
+const creditCardExpiringSoon = (self) => {
+	const today = new Date();
+	const creditCardExpiring = self.credit_card.expiration.split('/');
+	const monthExpiring = creditCardExpiring[0];
+	const yearExpiring = parseInt(`20${creditCardExpiring[1]}`);
+	const currentMonth = today.getMonth() + 1;
+	const currentYear = today.getFullYear();
+	if (currentYear === yearExpiring) {
+		if (currentMonth <= monthExpiring) {
+			return true;
+		} else {
+			return false;
+		}
+	} else if (yearExpiring === currentYear + 1) {
+		if (currentMonth > monthExpiring) {
+			;
+			return true;
+		} else {
+			return false;
+		}
+	} else {
+		return false;
+	}
 }
 
-const createList = () => {
-	main.innerHTML = "";
-	const ol = document.createElement('ol');
-	main.appendChild(ol);
-	return ol;
-}
 
+// Sorting functions
 
 const sortFirstNames = (a, b) => {
 	if (a.name < b.name) {
@@ -94,38 +87,6 @@ function sortHighToLow(a, b) {
 	return 0;
 }
 
-const compressArray = (original) => {
-
-	var compressed = [];
-	// make a copy of the input array
-	var copy = original.slice(0);
-
-	// first loop goes over every element
-	for (var i = 0; i < original.length; i++) {
-
-		var myCount = 0;
-		// loop over every element in the copy and see if it's the same
-		for (var w = 0; w < copy.length; w++) {
-			if (original[i] == copy[w]) {
-				// increase amount of times duplicate is found
-				myCount++;
-				// sets item to undefined
-				delete copy[w];
-			}
-		}
-
-		if (myCount > 0) {
-			var a = new Object();
-			a.value = original[i];
-			a.count = myCount;
-			compressed.push(a);
-		}
-	}
-
-	return compressed;
-};
-
-
 const sortExpirationDates = (a, b) => {
 	const dateA = a.credit_card.expiration.split('/');
 	const monthA = dateA[0];
@@ -145,108 +106,44 @@ const sortExpirationDates = (a, b) => {
 }
 
 
-const getCountryList = () => {
-	console.log("HELLO HERE I AM")
-	const regionArray = randomPersonData.map(person => person.region).sort();
-	var uniqueRegions = regionArray.filter(onlyUnique);
-	const ol = createList();
-	uniqueRegions.forEach(item => {
-		const li = document.createElement('li');
-		li.innerHTML = item;
-		ol.appendChild(li)
-	})
-}
+// Getting list with count of certain values
 
-const getCapricornWomen = () => {
-	var womenArray = randomPersonData.filter(onlyFemale);
-	var womenOlderThan30Array = womenArray.filter(olderThan30);
-	var capricornWomenOlderThan30 = womenOlderThan30Array.filter(onlyCapricorn);
-	capricornWomenOlderThan30.sort(sortFirstNames);
-	const ol = createList();
-	capricornWomenOlderThan30.forEach(item => {
-		const li = document.createElement('li');
-		li.innerHTML = `${item.name} ${item.surname}`;
-		const img = document.createElement('img');
-		img.src = item.photo;
-		li.appendChild(img)
-		ol.appendChild(li)
-	})
-}
+const compressArray = (original) => {
+	var compressed = [];
+	// make a copy of the input array
+	var copy = original.slice(0);
+	// first loop goes over every element
+	for (var i = 0; i < original.length; i++) {
+		var myCount = 0;
+		// loop over every element in the copy and see if it's the same
+		for (var w = 0; w < copy.length; w++) {
+			if (original[i] == copy[w]) {
+				// increase amount of times duplicate is found
+				myCount++;
+				// sets item to undefined
+				delete copy[w];
+			}
+		}
+		if (myCount > 0) {
+			var a = new Object();
+			a.value = original[i];
+			a.count = myCount;
+			compressed.push(a);
+		}
+	}
+	return compressed;
+};
 
-/* Maak een lijst van mensen:
-
-laat per persoon de volgende data zien
-voornaam, achternaam
-telefoonnummer
-creditcardnummer
-verloopdatum
-De lijst mag alleen volwassenen bevatten.
-
-De verloopdatum moet in de toekomst liggen (van dit jaar).
-
-De verloopdatum moet in het komende jaar liggen.
-
-Sorteer de lijst zodat de snelst verlopende creditcards bovenaan staan. */
-
-const getListOfOldCreditCards = () => {
-	const adults = randomPersonData.filter(isAdult);
-	const ol = createList();
-	const peopleWithExpiringCreditcards = adults.filter(creditCardExpiringSoon);
-	peopleWithExpiringCreditcards.sort(sortExpirationDates);
-	console.log(peopleWithExpiringCreditcards);
-	console.log(peopleWithExpiringCreditcards[0].credit_card.expiration.split('/'))
-	peopleWithExpiringCreditcards.forEach(item => {
-		const li = document.createElement('li');
-		li.innerHTML = `Name: ${item.name} ${item.surname}, Phone number: ${item.phone}, credit card number: ${item.credit_card.number}, expiring: ${item.credit_card.expiration}`;
-		ol.appendChild(li)
-	})
-}
-
-
-
-
-const getListOfMostPeople = () => {
-	const regionArray = randomPersonData.map(person => person.region).sort();
-	const compressedArray = compressArray(regionArray);
-	const sortedArray = compressedArray.sort(sortHighToLow)
-	const ol = createList();
-	compressedArray.forEach(item => {
-		const li = document.createElement('li');
-		li.innerHTML = `${item.value}: ${item.count} people`;
-		ol.appendChild(li)
-	})
-}
-
+// Calculations
 const calculateAverageAge = (event, regionsAndAges) => {
 	const target = event.target.innerHTML;
 	const onlyThisCountry = regionsAndAges.filter(item => item.region === target);
 	const agesInThisCountry = onlyThisCountry.map(item => item.age);
 	const sumOfAges = agesInThisCountry.reduce((a, b) => a + b, 0);
 	const averageAge = Math.round((sumOfAges / agesInThisCountry.length));
-	console.log(agesInThisCountry, "The sum is ", sumOfAges, "The average age is", averageAge);
 	const h2 = document.createElement('h2');
 	h2.innerHTML = `The average age in ${target} is ${averageAge}.`
 	main.appendChild(h2);
-}
-
-
-const averageAge = () => {
-	const regionsAndAges = randomPersonData.map(person => (
-		{
-			region: person.region,
-			age: person.age
-		}
-	));
-	const regionArray = regionsAndAges.map(person => person.region).sort();
-	console.log(regionArray)
-	var uniqueRegions = regionArray.filter(onlyUnique);
-	main.innerHTML = "";
-	uniqueRegions.forEach(item => {
-		const button = document.createElement('button');
-		button.innerHTML = item;
-		main.appendChild(button)
-		button.addEventListener('click', function () { calculateAverageAge(event, regionsAndAges); })
-	})
 }
 
 const findMatches = (event) => {
@@ -291,6 +188,9 @@ const findMatches = (event) => {
 	const h2 = document.createElement('h2');
 	h2.innerHTML = `Matching ${personInList[0].name} ${personInList[0].surname}, ${personInList[0].zodiac}`
 	main.appendChild(h2);
+	const img = document.createElement('img');
+	img.src = personInList[0].photo;
+	main.appendChild(img)
 	const h3 = document.createElement('h3');
 	h3.innerHTML = "Matches:";
 	main.appendChild(h3);
@@ -305,6 +205,82 @@ const findMatches = (event) => {
 }
 
 
+// Main button functions
+
+const getCountryList = () => {
+	const regionArray = randomPersonData.map(person => person.region).sort();
+	var uniqueRegions = regionArray.filter(onlyUnique);
+	const ol = createList();
+	uniqueRegions.forEach(item => {
+		const li = document.createElement('li');
+		li.innerHTML = item;
+		ol.appendChild(li)
+	})
+}
+
+const getCapricornWomen = () => {
+	var womenArray = randomPersonData.filter(onlyFemale);
+	var womenOlderThan30Array = womenArray.filter(olderThan30);
+	var capricornWomenOlderThan30 = womenOlderThan30Array.filter(onlyCapricorn);
+	capricornWomenOlderThan30.sort(sortFirstNames);
+	const ol = createList();
+	capricornWomenOlderThan30.forEach(item => {
+		const li = document.createElement('li');
+		li.innerHTML = `${item.name} ${item.surname}`;
+		const img = document.createElement('img');
+		img.src = item.photo;
+		li.appendChild(img)
+		ol.appendChild(li)
+	})
+}
+
+const getListOfExpiringCreditCards = () => {
+	const adults = randomPersonData.filter(isAdult);
+	const ol = createList();
+	const peopleWithExpiringCreditcards = adults.filter(creditCardExpiringSoon);
+	peopleWithExpiringCreditcards.sort(sortExpirationDates);
+	console.log(peopleWithExpiringCreditcards);
+	console.log(peopleWithExpiringCreditcards[0].credit_card.expiration.split('/'))
+	peopleWithExpiringCreditcards.forEach(item => {
+		const li = document.createElement('li');
+		li.innerHTML = `Name: ${item.name} ${item.surname}, Phone number: ${item.phone}, credit card number: ${item.credit_card.number}, expiring: ${item.credit_card.expiration}`;
+		ol.appendChild(li)
+	})
+}
+
+const getListOfMostPeople = () => {
+	const regionArray = randomPersonData.map(person => person.region).sort();
+	const compressedArray = compressArray(regionArray);
+	const sortedArray = compressedArray.sort(sortHighToLow)
+	const ol = createList();
+	compressedArray.forEach(item => {
+		const li = document.createElement('li');
+		li.innerHTML = `${item.value}: ${item.count} people`;
+		ol.appendChild(li)
+	})
+}
+
+const averageAge = () => {
+	const regionsAndAges = randomPersonData.map(person => (
+		{
+			region: person.region,
+			age: person.age
+		}
+	));
+	const regionArray = regionsAndAges.map(person => person.region).sort();
+	var uniqueRegions = regionArray.filter(onlyUnique);
+	main.innerHTML = "";
+	uniqueRegions.forEach(item => {
+		const button = document.createElement('button');
+		button.innerHTML = item;
+		main.appendChild(button)
+		button.addEventListener('click', function () { calculateAverageAge(event, regionsAndAges); })
+	})
+}
+
+
+
+
 const matchMaking = () => {
 	const sortedList = randomPersonData.sort(sortFirstNames);
 	const ol = createList();
@@ -312,6 +288,9 @@ const matchMaking = () => {
 		const li = document.createElement('li');
 		li.innerHTML = `${item.name} ${item.surname}, ${item.age}, ${item.region}, ${item.zodiac}`;
 		li.classList = `${item.surname} ${item.zodiac}`;
+		const img = document.createElement('img');
+		img.src = item.photo;
+		li.appendChild(img)
 		ol.appendChild(li);
 		const button = document.createElement('button');
 		button.innerHTML = "Find matches";
@@ -323,7 +302,7 @@ const matchMaking = () => {
 
 document.querySelector('#button-country-list').addEventListener("click", getCountryList);
 document.querySelector('#button-capricorn-women').addEventListener("click", getCapricornWomen);
-document.querySelector('#button-expiring-creditcards').addEventListener("click", getListOfOldCreditCards);
+document.querySelector('#button-expiring-creditcards').addEventListener("click", getListOfExpiringCreditCards);
 document.querySelector('#button-most-people').addEventListener("click", getListOfMostPeople);
 document.querySelector('#button-average-age').addEventListener("click", averageAge);
 document.querySelector('#button-matchmaking').addEventListener("click", matchMaking);
