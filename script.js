@@ -1,6 +1,7 @@
 console.log(randomPersonData);
 const main = document.querySelector('main');
 
+
 const onlyUnique = (value, index, self) => self.indexOf(value) === index;
 
 const onlyFemale = (self) => self.gender === "female";
@@ -83,6 +84,48 @@ const sortFirstNames = (a, b) => {
 	return 0;
 }
 
+function sortHighToLow(a, b) {
+	if (a.count > b.count) {
+		return -1;
+	}
+	if (a.count < b.count) {
+		return 1;
+	}
+	return 0;
+}
+
+const compressArray = (original) => {
+
+	var compressed = [];
+	// make a copy of the input array
+	var copy = original.slice(0);
+
+	// first loop goes over every element
+	for (var i = 0; i < original.length; i++) {
+
+		var myCount = 0;
+		// loop over every element in the copy and see if it's the same
+		for (var w = 0; w < copy.length; w++) {
+			if (original[i] == copy[w]) {
+				// increase amount of times duplicate is found
+				myCount++;
+				// sets item to undefined
+				delete copy[w];
+			}
+		}
+
+		if (myCount > 0) {
+			var a = new Object();
+			a.value = original[i];
+			a.count = myCount;
+			compressed.push(a);
+		}
+	}
+
+	return compressed;
+};
+
+
 const sortExpirationDates = (a, b) => {
 	const dateA = a.credit_card.expiration.split('/');
 	const monthA = dateA[0];
@@ -103,6 +146,7 @@ const sortExpirationDates = (a, b) => {
 
 
 const getCountryList = () => {
+	console.log("HELLO HERE I AM")
 	const regionArray = randomPersonData.map(person => person.region).sort();
 	var uniqueRegions = regionArray.filter(onlyUnique);
 	const ol = createList();
@@ -159,17 +203,57 @@ const getListOfOldCreditCards = () => {
 }
 
 
+
+
 const getListOfMostPeople = () => {
 	const regionArray = randomPersonData.map(person => person.region).sort();
+	const compressedArray = compressArray(regionArray);
+	const sortedArray = compressedArray.sort(sortHighToLow)
 	const ol = createList();
-	regionArray.forEach(item => {
+	compressedArray.forEach(item => {
 		const li = document.createElement('li');
-		li.innerHTML = item;
+		li.innerHTML = `${item.value}: ${item.count} people`;
 		ol.appendChild(li)
 	})
 }
 
-getCountryList();
-getCapricornWomen();
-getListOfOldCreditCards();
-getListOfMostPeople();
+const calculateAverageAge = (event, regionsAndAges) => {
+	const target = event.target.innerHTML;
+	const onlyThisCountry = regionsAndAges.filter(item => item.region === target);
+	const agesInThisCountry = onlyThisCountry.map(item => item.age);
+	const sumOfAges = agesInThisCountry.reduce((a, b) => a + b, 0);
+	const averageAge = Math.round((sumOfAges / agesInThisCountry.length));
+	console.log(agesInThisCountry, "The sum is ", sumOfAges, "The average age is", averageAge);
+	const h2 = document.createElement('h2');
+	h2.innerHTML = `The average age in ${target} is ${averageAge}.`
+	main.appendChild(h2);
+}
+
+
+const averageAge = () => {
+	const regionsAndAges = randomPersonData.map(person => (
+		{
+			region: person.region,
+			age: person.age
+		}
+	));
+	const regionArray = regionsAndAges.map(person => person.region).sort();
+	console.log(regionArray)
+	var uniqueRegions = regionArray.filter(onlyUnique);
+	main.innerHTML = "";
+	uniqueRegions.forEach(item => {
+		const button = document.createElement('button');
+		button.innerHTML = item;
+		main.appendChild(button)
+		button.addEventListener('click', function () { calculateAverageAge(event, regionsAndAges); })
+	})
+}
+
+
+
+
+document.querySelector('#button-country-list').addEventListener("click", getCountryList);
+document.querySelector('#button-capricorn-women').addEventListener("click", getCapricornWomen);
+document.querySelector('#button-expiring-creditcards').addEventListener("click", getListOfOldCreditCards);
+document.querySelector('#button-most-people').addEventListener("click", getListOfMostPeople);
+document.querySelector('#button-average-age').addEventListener("click", averageAge);
