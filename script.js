@@ -249,11 +249,81 @@ const averageAge = () => {
 	})
 }
 
+const findMatches = (event) => {
+	const person = event.target.parentElement.classList
+	const personName = person[0];
+	const zodiac = person[person.length - 1];
+	main.innerHTML = "";
+	const personInList = randomPersonData.filter(obj => {
+		return obj.surname.includes(personName)
+	})
+	const matchingZodiac = zodiac => {
+		switch (zodiac) {
+			case "Aries":
+				return "Aquarius";
+			case "Aquarius":
+				return "Aries";
+			case "Virgo":
+				return "Cancer";
+			case "Cancer":
+				return "Virgo";
+			case "Taurus":
+				return "Capricorn";
+			case "Capricorn":
+				return "Taurus";
+			case "Gemini":
+				return "Libra";
+			case "Libra":
+				return "Gemini";
+			case "Scorpio":
+				return "Pisces";
+			case "Pisces":
+				return "Scorpio";
+			case "Leo":
+				return "Sagittarius";
+			case "Sagittarius":
+				return "Leo";
+		}
+	}
+	const matches = randomPersonData.filter(obj => {
+		return obj.zodiac === matchingZodiac(zodiac);
+	}).filter(obj => !obj.surname.includes(personName));
+	const h2 = document.createElement('h2');
+	h2.innerHTML = `Matching ${personInList[0].name} ${personInList[0].surname}, ${personInList[0].zodiac}`
+	main.appendChild(h2);
+	const h3 = document.createElement('h3');
+	h3.innerHTML = "Matches:";
+	main.appendChild(h3);
+	const ol = document.createElement('ol');
+	main.appendChild(ol);
+	matches.forEach(match => {
+		const li = document.createElement('li');
+		li.innerHTML = `${match.name} ${match.surname}, ${match.age}, ${match.region}`
+		ol.appendChild(li);
+	})
+
+}
 
 
+const matchMaking = () => {
+	const sortedList = randomPersonData.sort(sortFirstNames);
+	const ol = createList();
+	sortedList.forEach(item => {
+		const li = document.createElement('li');
+		li.innerHTML = `${item.name} ${item.surname}, ${item.age}, ${item.region}, ${item.zodiac}`;
+		li.classList = `${item.surname} ${item.zodiac}`;
+		ol.appendChild(li);
+		const button = document.createElement('button');
+		button.innerHTML = "Find matches";
+		li.appendChild(button);
+		button.classList = item.zodiac.toLowerCase();
+		button.addEventListener("click", function () { findMatches(event) })
+	})
+}
 
 document.querySelector('#button-country-list').addEventListener("click", getCountryList);
 document.querySelector('#button-capricorn-women').addEventListener("click", getCapricornWomen);
 document.querySelector('#button-expiring-creditcards').addEventListener("click", getListOfOldCreditCards);
 document.querySelector('#button-most-people').addEventListener("click", getListOfMostPeople);
 document.querySelector('#button-average-age').addEventListener("click", averageAge);
+document.querySelector('#button-matchmaking').addEventListener("click", matchMaking);
